@@ -103,6 +103,7 @@ async function withLocalRedisTimeout(client, command, timeoutMs = 30000) {
 
 // 获取本地 Redis 键值
 export async function getLocalRedisKey(key) {
+  if (!globals.localRedisUrl) return null;
   try {
     if (!(await checkLocalRedisConnection())) {
       await createLocalRedisClient();
@@ -122,6 +123,7 @@ export async function getLocalRedisKey(key) {
 
 // 设置本地 Redis 键值
 export async function setLocalRedisKey(key, value, { force = false, timeoutMs } = {}) {
+  if (!globals.localRedisUrl) return;
   if (!force && !canPersistCacheKey(key, 'localRedis')) return { result: 'ERROR' };
   const serializedValue = serializeValue(key, value);
   return setSerializedLocalRedisKey(key, serializedValue, simpleHash(serializedValue), { force, timeoutMs });
@@ -158,6 +160,7 @@ async function setSerializedLocalRedisKey(key, serializedValue, currentHash, { f
 
 // 设置带过期时间的本地 Redis 键值
 export async function setLocalRedisKeyWithExpiry(key, value, expirySeconds) {
+  if (!globals.localRedisUrl) return;
   if (!canPersistCacheKey(key, 'localRedis')) return { result: 'ERROR' };
   const serializedValue = serializeValue(key, value);
   const currentHash = simpleHash(serializedValue);
@@ -190,6 +193,7 @@ export async function setLocalRedisKeyWithExpiry(key, value, expirySeconds) {
 
 // 优化后的 getLocalRedisCaches，批量获取所有键
 export async function getLocalRedisCaches(restored = {}) {
+  if (!globals.localRedisUrl) return null;
   if (globals.localRedisCacheInitialized) return true;
   if (initializing) return initializing;
   initializing = (async () => {
