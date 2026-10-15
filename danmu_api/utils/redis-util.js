@@ -48,6 +48,7 @@ const requestTimeout = key => String(key).startsWith('localDanmu:') ? 60000 : 30
 
 // 使用 GET 发送简单命令（如 PING 检查连接）
 export async function pingRedis() {
+  if (!globals.redisUrl) return false;
   const url = `${globals.redisUrl}/ping`;
   log("info", `[system] [redis] 开始发送 PING 请求:`, url);
   try {
@@ -71,6 +72,7 @@ export async function pingRedis() {
 
 // 使用 GET 发送 GET 命令（读取键值）
 export async function getRedisKey(key) {
+  if (!globals.redisUrl) return null;
   const url = `${globals.redisUrl}/get/${key}`;
   log("info", `[system] [redis] 开始发送 GET 请求:`, url);
   try {
@@ -94,6 +96,7 @@ export async function getRedisKey(key) {
 
 // 使用 POST 发送 SET 命令，仅在值变化时更新
 export async function setRedisKey(key, value) {
+  if (!globals.redisUrl) return;
   const version = redisConnectionVersion;
   const connectionKey = currentRedisConnectionKey();
   if (!canPersistCacheKey(key, 'upstash')) return { result: 'ERROR' };
@@ -137,6 +140,7 @@ export async function setRedisKey(key, value) {
 
 // 使用 POST 发送 SETEX 命令，仅在值变化时更新
 export async function setRedisKeyWithExpiry(key, value, expirySeconds) {
+  if (!globals.redisUrl) return;
   const version = redisConnectionVersion;
   const connectionKey = currentRedisConnectionKey();
   if (!canPersistCacheKey(key, 'upstash')) return { result: 'ERROR' };
